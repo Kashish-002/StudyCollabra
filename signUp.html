@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - StudyBuddy</title>
+    <link rel="stylesheet" href="signUpStyle.css">
+</head>
+<body>
+    <div class="signup-container">
+        <div class="logo">
+            <h1>StudyBuddy</h1>
+            <p>Join thousands of students worldwide</p>
+        </div>
+
+        <div class="form-progress">
+            <div class="form-progress-bar" id="progressBar"></div>
+        </div>
+
+        <form id="signupForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" name="firstName" required>
+                    <div class="error-message" id="firstNameError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" required>
+                    <div class="error-message" id="lastNameError"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+                <div class="error-message" id="emailError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+                <div class="password-strength" id="passwordStrength"></div>
+                <div class="error-message" id="passwordError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                <div class="error-message" id="confirmPasswordError"></div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="university">University</label>
+                    <input type="text" id="university" name="university" required>
+                    <div class="error-message" id="universityError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="academicLevel">Academic Level</label>
+                    <select id="academicLevel" name="academicLevel" required>
+                        <option value="">Select Level</option>
+                        <option value="high-school">High School</option>
+                        <option value="undergraduate">Undergraduate</option>
+                        <option value="graduate">Graduate</option>
+                        <option value="phd">PhD</option>
+                    </select>
+                    <div class="error-message" id="academicLevelError"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="major">Major/Field of Study</label>
+                <input type="text" id="major" name="major" required>
+                <div class="error-message" id="majorError"></div>
+            </div>
+
+            <div class="subjects-section">
+                <h3>Subjects You're Studying (Select all that apply)</h3>
+                <div class="subjects-grid">
+                    <div class="subject-item">
+                        <input type="checkbox" id="mathematics" name="subjects" value="mathematics">
+                        <label for="mathematics">Mathematics</label>
+                    </div>
+                    <div class="subject-item">
+                        <input type="checkbox" id="physics" name="subjects" value="physics">
+                        <label for="physics">Physics</label>
+                    </div>
+                    <div class="subject-item">
+                        <input type="checkbox" id="chemistry" name="subjects" value="chemistry">
+                        <label for="chemistry">Chemistry</label>
+                    </div>
+                    <div class="subject-item">
+                        <input type="checkbox" id="biology" name="subjects" value="biology">
+                        <label for="biology">Biology</label>
+                    </div>
+                    <div class="subject-item">
+                        <input type="checkbox" id="computer-science" name="subjects" value="computer-science">
+                        <label for="computer-science">Computer Science</label>
+                    </div>
+                    <div class="subject-item">
+                        <input type="checkbox" id="literature" name="subjects" value="literature">
+                        <label for="literature">Literature</label>
+                    </div>
+                    <div class="subject-item">
+                        <input type="checkbox" id="history" name="subjects" value="history">
+                        <label for="history">History</label>
+                    </div>
+                    <div class="subject-item">
+                        <input type="checkbox" id="economics" name="subjects" value="economics">
+                        <label for="economics">Economics</label>
+                    </div>
+                </div>
+                <div class="error-message" id="subjectsError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="bio">Tell us about yourself (Optional)</label>
+                <textarea id="bio" name="bio" placeholder="What are your study goals? What subjects are you passionate about?"></textarea>
+            </div>
+
+            <button type="submit" class="btn" id="signupBtn">Create Account</button>
+        </form>
+
+        <div class="divider">
+            <span>or sign up with</span>
+        </div>
+
+        <div class="social-buttons">
+            <button class="social-btn google" onclick="signupWithGoogle()">
+                <span>📧</span> Google
+            </button>
+            <button class="social-btn facebook" onclick="signupWithFacebook()">
+                <span>📘</span> Facebook
+            </button>
+        </div>
+
+        <div class="signin-link">
+            Already have an account? <a href="#" onclick="goToSignIn()">Sign In</a>
+        </div>
+    </div>
+
+    <script>
+        // Form validation and progress tracking
+        const form = document.getElementById('signupForm');
+        const progressBar = document.getElementById('progressBar');
+        const signupBtn = document.getElementById('signupBtn');
+
+        // Track form completion
+        function updateProgress() {
+            const requiredFields = form.querySelectorAll('[required]');
+            let completedFields = 0;
+            
+            requiredFields.forEach(field => {
+                if (field.type === 'checkbox') {
+                    const checkboxes = form.querySelectorAll('input[name="subjects"]:checked');
+                    if (checkboxes.length > 0) completedFields++;
+                } else if (field.value.trim() !== '') {
+                    completedFields++;
+                }
+            });
+
+            // Add subjects as one field
+            const subjectsChecked = form.querySelectorAll('input[name="subjects"]:checked').length > 0;
+            if (subjectsChecked) completedFields++;
+
+            const progress = (completedFields / (requiredFields.length + 1)) * 100;
+            progressBar.style.width = progress + '%';
+        }
+
+        // Add event listeners to all form fields
+        form.addEventListener('input', updateProgress);
+        form.addEventListener('change', updateProgress);
+
+        // Password strength checker
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthElement = document.getElementById('passwordStrength');
+            
+            if (password.length === 0) {
+                strengthElement.textContent = '';
+                return;
+            }
+
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            if (strength < 3) {
+                strengthElement.textContent = 'Weak password';
+                strengthElement.className = 'password-strength strength-weak';
+            } else if (strength < 4) {
+                strengthElement.textContent = 'Medium password';
+                strengthElement.className = 'password-strength strength-medium';
+            } else {
+                strengthElement.textContent = 'Strong password';
+                strengthElement.className = 'password-strength strength-strong';
+            }
+        });
+
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+            
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+
+            // Validate first name
+            const firstName = document.getElementById('firstName').value.trim();
+            if (firstName.length < 2) {
+                showError('firstNameError', 'First name must be at least 2 characters');
+                isValid = false;
+            }
+
+            // Validate last name
+            const lastName = document.getElementById('lastName').value.trim();
+            if (lastName.length < 2) {
+                showError('lastNameError', 'Last name must be at least 2 characters');
+                isValid = false;
+            }
+
+            // Validate email
+            const email = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showError('emailError', 'Please enter a valid email address');
+                isValid = false;
+            }
+
+            // Validate password
+            const password = document.getElementById('password').value;
+            if (password.length < 8) {
+                showError('passwordError', 'Password must be at least 8 characters');
+                isValid = false;
+            }
+
+            // Validate confirm password
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            if (password !== confirmPassword) {
+                showError('confirmPasswordError', 'Passwords do not match');
+                isValid = false;
+            }
+
+            // Validate university
+            const university = document.getElementById('university').value.trim();
+            if (university.length < 2) {
+                showError('universityError', 'Please enter your university name');
+                isValid = false;
+            }
+
+            // Validate academic level
+            const academicLevel = document.getElementById('academicLevel').value;
+            if (!academicLevel) {
+                showError('academicLevelError', 'Please select your academic level');
+                isValid = false;
+            }
+
+            // Validate major
+            const major = document.getElementById('major').value.trim();
+            if (major.length < 2) {
+                showError('majorError', 'Please enter your major/field of study');
+                isValid = false;
+            }
+
+            // Validate subjects
+            const subjects = document.querySelectorAll('input[name="subjects"]:checked');
+            if (subjects.length === 0) {
+                showError('subjectsError', 'Please select at least one subject');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+
+            // Disable button and show loading
+            signupBtn.disabled = true;
+            signupBtn.textContent = 'Creating Account...';
+
+            // Simulate account creation
+            setTimeout(() => {
+                const formData = new FormData(form);
+                const userData = {};
+                
+                // Collect form data
+                for (let [key, value] of formData.entries()) {
+                    if (key === 'subjects') {
+                        if (!userData.subjects) userData.subjects = [];
+                        userData.subjects.push(value);
+                    } else {
+                        userData[key] = value;
+                    }
+                }
+
+                console.log('Account created:', userData);
+                
+                // Show success message
+                signupBtn.textContent = 'Account Created Successfully!';
+                signupBtn.style.background = '#27ae60';
+                
+                // Redirect after success
+                setTimeout(() => {
+                    alert('Welcome to StudyBuddy! Your account has been created successfully.');
+                    // redirect to dashboard or sign-in page
+                    window.location.href = 'index.html';
+                }, 2000);
+                
+            }, 2000);
+        });
+
+        // Social signup functions
+        function signupWithGoogle() {
+            alert('Google signup integration would be implemented here');
+        }
+
+        function signupWithFacebook() {
+            alert('Facebook signup integration would be implemented here');
+        }
+
+        function goToSignIn() {
+            // navigate to the sign-in page
+            alert('This would redirect to the sign-in page');
+        }
+
+        // Initialize progress on page load
+        updateProgress();
+    </script>
+</body>
+</html>
